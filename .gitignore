@@ -1,0 +1,20 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Export builds and credentials
+/builds/
+export_credentials.cfg
+
+# Krita / editor backups and temp files
+*.kra~
+*.kra-autosave.kra
+*~
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local tools (Godot binary should live outside the repo)
+/apps/
