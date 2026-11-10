@@ -21,6 +21,38 @@ namespace MagicWorld
         GUIStyle big, mid, small;
         float flash;
 
+        // TerrainCollider в этом проекте не даёт контактов (лучи видят, предметы проваливаются),
+        // поэтому строим физическую землю обычным MeshCollider по рельефу с шагом 1 м.
+        void BuildGroundCollider()
+        {
+            var t = Terrain.activeTerrain;
+            if (t == null) return;
+            const int n = 201; // 200 м → 201 вершина
+            var origin = t.transform.position;
+            var size = t.terrainData.size;
+            var verts = new Vector3[n * n];
+            for (int z = 0; z < n; z++)
+                for (int x = 0; x < n; x++)
+                {
+                    float wx = origin.x + size.x * x / (n - 1), wz = origin.z + size.z * z / (n - 1);
+                    verts[z * n + x] = new Vector3(wx, origin.y + t.SampleHeight(new Vector3(wx, 0, wz)), wz);
+                }
+            var tris = new int[(n - 1) * (n - 1) * 6];
+            int k = 0;
+            for (int z = 0; z < n - 1; z++)
+                for (int x = 0; x < n - 1; x++)
+                {
+                    int i = z * n + x;
+                    tris[k++] = i; tris[k++] = i + n; tris[k++] = i + 1;
+                    tris[k++] = i + 1; tris[k++] = i + n; tris[k++] = i + n + 1;
+                }
+            var mesh = new Mesh { name = "GroundPhysics", indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 };
+            mesh.vertices = verts; mesh.triangles = tris;
+            var go = new GameObject("GroundPhysics");
+            go.AddComponent<MeshCollider>().sharedMesh = mesh;
+            Physics.SyncTransforms();
+        }
+
         System.Collections.IEnumerator PhysicsProbe()
         {
             var t = Terrain.activeTerrain; var tc = t.GetComponent<TerrainCollider>();
@@ -29,16 +61,26 @@ namespace MagicWorld
             var ball = GameObject.CreatePrimitive(PrimitiveType.Sphere); ball.name = "ProbeBall";
             ball.transform.position = pos; ball.AddComponent<Rigidbody>();
             float groundAtBall = t.SampleHeight(pos);
+            var bridge = GameObject.Find("Bridge");
+            GameObject ball2 = null;
+            if (bridge != null)
+            {
+                ball2 = GameObject.CreatePrimitive(PrimitiveType.Sphere); ball2.name = "ProbeBall2";
+                ball2.transform.position = bridge.transform.position + Vector3.up * 3f; ball2.AddComponent<Rigidbody>();
+            }
             yield return new WaitForSeconds(2f);
             var sb = new System.Text.StringBuilder("[Probe2] ");
             sb.AppendLine($"шар: старт y={pos.y:F2}, сейчас y={ball.transform.position.y:F2}, земля y={groundAtBall:F2} -> " + (ball.transform.position.y > groundAtBall - 0.2f ? "ДЕРЖИТ" : "ПРОВАЛИЛСЯ"));
+            if (ball2 != null) sb.AppendLine($"шар над мостом: y={ball2.transform.position.y:F2} (мост y={bridge.transform.position.y:F2}) -> " + (ball2.transform.position.y > bridge.transform.position.y - 0.2f ? "ДЕРЖИТ" : "ПРОВАЛИЛСЯ"));
             sb.AppendLine($"terrain.enabled={t.enabled} collider.enabled={tc.enabled} data={(tc.terrainData != null)} holesRes={t.terrainData.holesResolution}");
             sb.AppendLine($"bounds={tc.bounds} material={(tc.sharedMaterial != null ? tc.sharedMaterial.name : "нет")} layer={t.gameObject.layer} gameObjectStatic={t.gameObject.isStatic}");
             var rb = hero.GetComponent<Rigidbody>();
             sb.AppendLine($"герой: y={hero.transform.position.y:F2} vel={rb.linearVelocity} isKinematic={rb.isKinematic} gravity={Physics.gravity} defaultContactOffset={Physics.defaultContactOffset}");
             Debug.Log(sb.ToString());
-            Destroy(ball);
+            Destroy(ball); if (ball2 != null) Destroy(ball2);
         }
+
+        void Awake() { BuildGroundCollider(); }
 
         void Start()
         {
