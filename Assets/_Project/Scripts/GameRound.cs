@@ -24,7 +24,7 @@ namespace MagicWorld
         System.Collections.IEnumerator PhysicsProbe()
         {
             yield return new WaitForSeconds(1.5f);
-            var sb = new System.Text.StringBuilder("[Probe] физика: simMode=" + Physics.simulationMode + " autoSync=" + Physics.autoSyncTransforms + "\n");
+            var sb = new System.Text.StringBuilder("[Probe] физика: simMode=" + Physics.simulationMode + "\n");
             var cc = hero.GetComponent<CharacterController>();
             sb.AppendLine($"hero.y={hero.transform.position.y:F2} isGrounded={cc.isGrounded} flags={cc.collisionFlags} enabled={cc.enabled} detect={cc.detectCollisions} layer={hero.gameObject.layer}");
             void Cast(string label, Vector3 p)
