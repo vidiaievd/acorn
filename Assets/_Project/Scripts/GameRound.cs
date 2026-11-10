@@ -21,8 +21,28 @@ namespace MagicWorld
         GUIStyle big, mid, small;
         float flash;
 
+        System.Collections.IEnumerator PhysicsProbe()
+        {
+            var t = Terrain.activeTerrain; var tc = t.GetComponent<TerrainCollider>();
+            // шар падает над землёй в стороне от героя
+            var pos = hero.transform.position + new Vector3(6, 3, 0);
+            var ball = GameObject.CreatePrimitive(PrimitiveType.Sphere); ball.name = "ProbeBall";
+            ball.transform.position = pos; ball.AddComponent<Rigidbody>();
+            float groundAtBall = t.SampleHeight(pos);
+            yield return new WaitForSeconds(2f);
+            var sb = new System.Text.StringBuilder("[Probe2] ");
+            sb.AppendLine($"шар: старт y={pos.y:F2}, сейчас y={ball.transform.position.y:F2}, земля y={groundAtBall:F2} -> " + (ball.transform.position.y > groundAtBall - 0.2f ? "ДЕРЖИТ" : "ПРОВАЛИЛСЯ"));
+            sb.AppendLine($"terrain.enabled={t.enabled} collider.enabled={tc.enabled} data={(tc.terrainData != null)} holesRes={t.terrainData.holesResolution} treeColliders={tc.enableTreeColliders}");
+            sb.AppendLine($"bounds={tc.bounds} material={(tc.sharedMaterial != null ? tc.sharedMaterial.name : "нет")} layer={t.gameObject.layer} gameObjectStatic={t.gameObject.isStatic}");
+            var rb = hero.GetComponent<Rigidbody>();
+            sb.AppendLine($"герой: y={hero.transform.position.y:F2} vel={rb.linearVelocity} isKinematic={rb.isKinematic} gravity={Physics.gravity} defaultContactOffset={Physics.defaultContactOffset}");
+            Debug.Log(sb.ToString());
+            Destroy(ball);
+        }
+
         void Start()
         {
+            StartCoroutine(PhysicsProbe());
             total = crystals.Count;
             timeLeft = timeLimit;
             hero.InputEnabled = true;
