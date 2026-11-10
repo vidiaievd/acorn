@@ -21,58 +21,8 @@ namespace MagicWorld
         GUIStyle big, mid, small;
         float flash;
 
-        // TerrainCollider в этом проекте не даёт контактов (лучи видят, предметы проваливаются),
-        // поэтому строим физическую землю обычным MeshCollider по рельефу с шагом 1 м.
-        void BuildGroundCollider()
-        {
-            var t = Terrain.activeTerrain;
-            if (t == null) return;
-            const int n = 201; // 200 м → 201 вершина
-            var origin = t.transform.position;
-            var size = t.terrainData.size;
-            var verts = new Vector3[n * n];
-            for (int z = 0; z < n; z++)
-                for (int x = 0; x < n; x++)
-                {
-                    float wx = origin.x + size.x * x / (n - 1), wz = origin.z + size.z * z / (n - 1);
-                    verts[z * n + x] = new Vector3(wx, origin.y + t.SampleHeight(new Vector3(wx, 0, wz)), wz);
-                }
-            var tris = new int[(n - 1) * (n - 1) * 6];
-            int k = 0;
-            for (int z = 0; z < n - 1; z++)
-                for (int x = 0; x < n - 1; x++)
-                {
-                    int i = z * n + x;
-                    tris[k++] = i; tris[k++] = i + n; tris[k++] = i + 1;
-                    tris[k++] = i + 1; tris[k++] = i + n; tris[k++] = i + n + 1;
-                }
-            var mesh = new Mesh { name = "GroundPhysics", indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 };
-            mesh.vertices = verts; mesh.triangles = tris;
-            var go = new GameObject("GroundPhysics");
-            go.AddComponent<MeshCollider>().sharedMesh = mesh;
-            Physics.SyncTransforms();
-        }
-
-        System.Collections.IEnumerator PhysicsProbe()
-        {
-            yield return new WaitForSeconds(3f);
-            var t = Terrain.activeTerrain;
-            var p = hero.transform.position;
-            var sb = new System.Text.StringBuilder("[Probe3] ");
-            sb.AppendLine($"герой y={p.y:F3}, высота земли по Terrain={t.SampleHeight(p) + t.transform.position.y:F3}");
-            var hits = Physics.RaycastAll(p + Vector3.up * 3f, Vector3.down, 20f);
-            System.Array.Sort(hits, (x, y) => y.point.y.CompareTo(x.point.y));
-            foreach (var h in hits) sb.AppendLine($"  луч вниз: {h.collider.name} ({h.collider.GetType().Name}) y={h.point.y:F3}");
-            var capsule = hero.GetComponent<CapsuleCollider>();
-            sb.AppendLine($"капсула: bounds.min.y={capsule.bounds.min.y:F3}, center={capsule.center}, height={capsule.height}, radius={capsule.radius}");
-            Debug.Log(sb.ToString());
-        }
-
-        void Awake() { BuildGroundCollider(); }
-
         void Start()
         {
-            StartCoroutine(PhysicsProbe());
             total = crystals.Count;
             timeLeft = timeLimit;
             hero.InputEnabled = true;
