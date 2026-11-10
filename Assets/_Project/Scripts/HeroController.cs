@@ -66,9 +66,11 @@ namespace MagicWorld
 
             if (cc.isGrounded && velocity.y < 0) velocity.y = -2f;
             if (jump && cc.isGrounded) velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            velocity.y += gravity * Time.deltaTime;
+            // защита от «длинных» кадров: иначе герой за один кадр пролетает сквозь землю
+            float dt = Mathf.Min(Time.deltaTime, 0.033f);
+            velocity.y = Mathf.Max(velocity.y + gravity * dt, -30f);
 
-            cc.Move((horizontal + Vector3.up * velocity.y) * Time.deltaTime);
+            cc.Move((horizontal + Vector3.up * velocity.y) * dt);
 
             // невидимые стены
             var p = transform.position;
@@ -99,6 +101,7 @@ namespace MagicWorld
 
         public void Respawn()
         {
+            Debug.LogWarning($"[Hero] провалился: pos={transform.position}, земля тут y={Terrain.activeTerrain.SampleHeight(transform.position)}, возврат в {lastSafePos}");
             cc.enabled = false;
             transform.position = lastSafePos + Vector3.up * 0.3f;
             cc.enabled = true;
