@@ -8,7 +8,7 @@
 
 ## Как запустить
 
-1. Установите **Unity 6000.6.8f1** через Unity Hub с модулями **Linux Build Support** и **Windows Build Support**. На всех компьютерах должна быть одна и та же версия (записана в `ProjectSettings/ProjectVersion.txt`).
+1. Установите **Unity 6000.3.28f1** через Unity Hub с модулями **Linux Build Support** и **Windows Build Support**. На всех компьютерах должна быть одна и та же версия (записана в `ProjectSettings/ProjectVersion.txt`).
 2. Установите [Git LFS](https://git-lfs.com) и выполните `git lfs install`.
 3. Склонируйте репозиторий:
    ```bash
@@ -26,7 +26,7 @@ git config merge.unityyamlmerge.name "Unity YAML Merge"
 git config merge.unityyamlmerge.driver '"/путь/к/Unity/Editor/Data/Tools/UnityYAMLMerge" merge -p %O %A %B %A'
 ```
 
-Пример пути: `Unity/Hub/Editor/6000.6.8f1/Editor/Data/Tools/UnityYAMLMerge`.
+Пример пути: `Unity/Hub/Editor/6000.3.28f1/Editor/Data/Tools/UnityYAMLMerge`.
 
 ## Документы
 
@@ -57,4 +57,4 @@ git config merge.unityyamlmerge.driver '"/путь/к/Unity/Editor/Data/Tools/Un
 
 ## Стек
 
-Unity 6000.6.8f1 · C# · Universal Render Pipeline (URP) · Input System · Cinemachine · ProBuilder · Polybrush · Terrain Tools · AI Navigation · VFX Graph · Shader Graph · Mixamo · Krita · Audacity · Git LFS
+Unity 6000.3.28f1 · C# · Universal Render Pipeline (URP) · Input System · Cinemachine · ProBuilder · Polybrush · Terrain Tools · AI Navigation · VFX Graph · Shader Graph · Mixamo · Krita · Audacity · Git LFS
