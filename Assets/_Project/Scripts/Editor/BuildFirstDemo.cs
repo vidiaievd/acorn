@@ -412,8 +412,8 @@ public static class BuildFirstDemo
         var across = new Vector2(-along.y, along.x);
         float yaw = Mathf.Atan2(across.x, across.y) * Mathf.Rad2Deg;
         var b = new GameObject("Bridge").transform; b.SetParent(parent, false);
-        b.position = new Vector3(Bridge.x, 3.4f, Bridge.y); b.rotation = Quaternion.Euler(0, yaw, 0);
-        Prim(PrimitiveType.Cube, "Deck", b, new Vector3(0, -0.15f, 0), new Vector3(3.2f, 0.3f, 17f), wood);
+        b.position = new Vector3(Bridge.x, 3.45f, Bridge.y); b.rotation = Quaternion.Euler(0, yaw, 0);
+        Prim(PrimitiveType.Cube, "Deck", b, new Vector3(0, -0.35f, 0), new Vector3(3.2f, 0.7f, 20f), wood);
         for (int i = -7; i <= 7; i++)
             Prim(PrimitiveType.Cube, "Plank", b, new Vector3(0, 0.02f, i * 1.1f), new Vector3(3.3f, 0.08f, 0.15f), woodDark, false);
         for (int side = -1; side <= 1; side += 2)

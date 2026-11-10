@@ -21,26 +21,6 @@ namespace MagicWorld
         GUIStyle big, mid, small;
         float flash;
 
-        void Awake()
-        {
-            // физическая земля: проверяем и при необходимости создаём коллайдер Terrain заново
-            var terrain = Terrain.activeTerrain;
-            var origin = hero.transform.position + Vector3.up * 100f;
-            bool ok = Physics.Raycast(origin, Vector3.down, out var hit, 300f);
-            Debug.Log($"[Round] до пересборки: terrain={(terrain != null)}, коллайдер={(terrain != null && terrain.GetComponent<TerrainCollider>() != null)}, луч попал={ok}, y={(ok ? hit.point.y : -999)}, коллайдер='{(ok ? hit.collider.name : "-")}', hero.y={hero.transform.position.y}");
-            if (terrain != null)
-            {
-                var old = terrain.GetComponent<TerrainCollider>();
-                var data = terrain.terrainData;
-                if (old != null) DestroyImmediate(old);
-                var fresh = terrain.gameObject.AddComponent<TerrainCollider>();
-                fresh.terrainData = data;
-                Physics.SyncTransforms();
-                ok = Physics.Raycast(origin, Vector3.down, out hit, 300f);
-                Debug.Log($"[Round] после пересборки: луч попал={ok}, y={(ok ? hit.point.y : -999)}, размер данных={data.size}, sample={terrain.SampleHeight(hero.transform.position)}");
-            }
-        }
-
         void Start()
         {
             total = crystals.Count;

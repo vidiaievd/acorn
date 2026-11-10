@@ -22,7 +22,6 @@ namespace MagicWorld
         Vector3 velocity;
         Vector3 lastSafePos;
         float safeTimer;
-        bool warnedNoCollider, snapped, snappedLast;
 
         void Awake()
         {
@@ -66,29 +65,12 @@ namespace MagicWorld
             Vector3 horizontal = dir * speed;
 
             if (cc.isGrounded && velocity.y < 0) velocity.y = -2f;
-            if (jump && (cc.isGrounded || snappedLast)) velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            if (jump && cc.isGrounded) velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
             // защита от «длинных» кадров: иначе герой за один кадр пролетает сквозь землю
             float dt = Mathf.Min(Time.deltaTime, 0.033f);
             velocity.y = Mathf.Max(velocity.y + gravity * dt, -30f);
 
             cc.Move((horizontal + Vector3.up * velocity.y) * dt);
-
-            // страховка: ниже поверхности земли герой оказаться не может (даже если физика земли не сработала)
-            var terr = Terrain.activeTerrain;
-            if (terr != null)
-            {
-                var tp = transform.position;
-                float ground = terr.SampleHeight(tp) + terr.transform.position.y;
-                if (tp.y < ground && ground > waterY + 0.3f)
-                {
-                    if (!warnedNoCollider) { warnedNoCollider = true; Debug.LogWarning($"[Hero] коллайдер земли не держит героя (y={tp.y:F2}, земля y={ground:F2}) — включена страховка по высоте"); }
-                    cc.enabled = false;
-                    transform.position = new Vector3(tp.x, ground, tp.z);
-                    cc.enabled = true;
-                    if (velocity.y < 0) velocity.y = -2f;
-                    snapped = true;
-                }
-            }
 
             // невидимые стены
             var p = transform.position;
@@ -108,9 +90,8 @@ namespace MagicWorld
                 model.rotation = Quaternion.Slerp(model.rotation, target, 1f - Mathf.Exp(-14f * Time.deltaTime));
             }
 
-            bool grounded = cc.isGrounded || snapped; snappedLast = snapped; snapped = false;
             // запоминаем безопасное место; упал в воду — вернулись на берег
-            if (grounded && transform.position.y > waterY + 0.6f)
+            if (cc.isGrounded && transform.position.y > waterY + 0.6f)
             {
                 safeTimer += Time.deltaTime;
                 if (safeTimer > 0.4f) { lastSafePos = transform.position; safeTimer = 0f; }
