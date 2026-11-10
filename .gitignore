@@ -1,20 +1,48 @@
-# Godot 4+ specific ignores
-.godot/
-/android/
-
-# Export builds and credentials
+# Unity: генерируемые папки (не коммитим)
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
 /builds/
+
+# Unity: сборки и пакеты
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Файлы IDE и сгенерированные проекты (Rider, VS, VS Code)
+*.csproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+.vs/
+.idea/
+.vscode/
+sysinfo.txt
+crashlytics-build.properties
+
+# Учётные данные и экспорт
 export_credentials.cfg
 
-# Krita / editor backups and temp files
+# Редакторы и временные файлы
 *.kra~
 *.kra-autosave.kra
 *~
 *.tmp
 
-# OS files
+# ОС
 .DS_Store
 Thumbs.db
-
-# Local tools (Godot binary should live outside the repo)
-/apps/
