@@ -32,7 +32,7 @@ namespace MagicWorld
             {
                 var old = terrain.GetComponent<TerrainCollider>();
                 var data = terrain.terrainData;
-                if (old != null) Destroy(old);
+                if (old != null) DestroyImmediate(old);
                 var fresh = terrain.gameObject.AddComponent<TerrainCollider>();
                 fresh.terrainData = data;
                 Physics.SyncTransforms();
