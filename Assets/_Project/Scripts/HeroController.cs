@@ -22,6 +22,7 @@ namespace MagicWorld
         Vector3 velocity;
         Vector3 lastSafePos;
         float safeTimer;
+        bool warnedNoCollider;
 
         void Awake()
         {
@@ -71,6 +72,22 @@ namespace MagicWorld
             velocity.y = Mathf.Max(velocity.y + gravity * dt, -30f);
 
             cc.Move((horizontal + Vector3.up * velocity.y) * dt);
+
+            // страховка: если физика земли не удержала героя, ставим его на поверхность
+            var terr = Terrain.activeTerrain;
+            if (terr != null)
+            {
+                var tp = transform.position;
+                float ground = terr.SampleHeight(tp) + terr.transform.position.y;
+                if (tp.y < ground && ground > waterY + 0.3f)
+                {
+                    if (!warnedNoCollider) { warnedNoCollider = true; Debug.LogWarning($"[Hero] физика земли не удержала героя (y={tp.y:F2}, земля y={ground:F2}), сработала страховка"); }
+                    cc.enabled = false;
+                    transform.position = new Vector3(tp.x, ground, tp.z);
+                    cc.enabled = true;
+                    velocity.y = Mathf.Max(velocity.y, -2f);
+                }
+            }
 
             // невидимые стены
             var p = transform.position;

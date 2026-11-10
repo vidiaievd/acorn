@@ -184,6 +184,11 @@ public static class BuildFirstDemo
                 hm[zi, xi] = HeightAt(wx, wz) / TerrainHeight;
             }
         td.SetHeights(0, 0, hm);
+        // убираем «дырки» в земле: true = сплошная земля (иначе физика может пропускать героя)
+        int hres = td.holesResolution;
+        var holes = new bool[hres, hres];
+        for (int i = 0; i < hres; i++) for (int j = 0; j < hres; j++) holes[i, j] = true;
+        td.SetHoles(0, 0, holes);
     }
 
     static Texture2D NoiseTex(string name, Color a, Color b, float scale, float detail)
