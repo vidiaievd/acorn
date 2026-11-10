@@ -450,8 +450,9 @@ public static class BuildFirstDemo
         var hero = new GameObject("Hero"); hero.tag = "Player";
         var spawn = P(235, 800);
         hero.transform.position = OnGround(terrain, spawn, 0.2f);
-        var cc = hero.AddComponent<CharacterController>();
-        cc.height = 1.8f; cc.radius = 0.4f; cc.center = new Vector3(0, 0.9f, 0); cc.stepOffset = 0.5f; cc.slopeLimit = 55f;
+        var cap = hero.AddComponent<CapsuleCollider>();
+        cap.height = 1.8f; cap.radius = 0.4f; cap.center = new Vector3(0, 0.9f, 0);
+        hero.AddComponent<Rigidbody>();
         var hc = hero.AddComponent<HeroController>();
 
         var model = new GameObject("Model").transform; model.SetParent(hero.transform, false);
