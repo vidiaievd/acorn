@@ -32,7 +32,7 @@ namespace MagicWorld
             yield return new WaitForSeconds(2f);
             var sb = new System.Text.StringBuilder("[Probe2] ");
             sb.AppendLine($"шар: старт y={pos.y:F2}, сейчас y={ball.transform.position.y:F2}, земля y={groundAtBall:F2} -> " + (ball.transform.position.y > groundAtBall - 0.2f ? "ДЕРЖИТ" : "ПРОВАЛИЛСЯ"));
-            sb.AppendLine($"terrain.enabled={t.enabled} collider.enabled={tc.enabled} data={(tc.terrainData != null)} holesRes={t.terrainData.holesResolution} treeColliders={tc.enableTreeColliders}");
+            sb.AppendLine($"terrain.enabled={t.enabled} collider.enabled={tc.enabled} data={(tc.terrainData != null)} holesRes={t.terrainData.holesResolution}");
             sb.AppendLine($"bounds={tc.bounds} material={(tc.sharedMaterial != null ? tc.sharedMaterial.name : "нет")} layer={t.gameObject.layer} gameObjectStatic={t.gameObject.isStatic}");
             var rb = hero.GetComponent<Rigidbody>();
             sb.AppendLine($"герой: y={hero.transform.position.y:F2} vel={rb.linearVelocity} isKinematic={rb.isKinematic} gravity={Physics.gravity} defaultContactOffset={Physics.defaultContactOffset}");
