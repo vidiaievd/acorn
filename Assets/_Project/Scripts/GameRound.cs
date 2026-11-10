@@ -21,8 +21,31 @@ namespace MagicWorld
         GUIStyle big, mid, small;
         float flash;
 
+        System.Collections.IEnumerator PhysicsProbe()
+        {
+            yield return new WaitForSeconds(1.5f);
+            var sb = new System.Text.StringBuilder("[Probe] физика: simMode=" + Physics.simulationMode + " autoSync=" + Physics.autoSyncTransforms + "\n");
+            var cc = hero.GetComponent<CharacterController>();
+            sb.AppendLine($"hero.y={hero.transform.position.y:F2} isGrounded={cc.isGrounded} flags={cc.collisionFlags} enabled={cc.enabled} detect={cc.detectCollisions} layer={hero.gameObject.layer}");
+            void Cast(string label, Vector3 p)
+            {
+                var hits = Physics.RaycastAll(new Vector3(p.x, 100, p.z), Vector3.down, 300f);
+                System.Array.Sort(hits, (a, b) => b.point.y.CompareTo(a.point.y));
+                sb.Append(label + ": ");
+                foreach (var h in hits) sb.Append($"{h.collider.name}({h.collider.GetType().Name}) y={h.point.y:F2}; ");
+                if (hits.Length == 0) sb.Append("НИЧЕГО");
+                sb.AppendLine();
+            }
+            Cast("под героем", hero.transform.position);
+            var bridge = GameObject.Find("Bridge");
+            if (bridge != null) Cast("под мостом", bridge.transform.position);
+            sb.AppendLine("коллайдеров в сцене: " + FindObjectsByType<Collider>(FindObjectsSortMode.None).Length);
+            Debug.Log(sb.ToString());
+        }
+
         void Start()
         {
+            StartCoroutine(PhysicsProbe());
             total = crystals.Count;
             timeLeft = timeLimit;
             hero.InputEnabled = true;
