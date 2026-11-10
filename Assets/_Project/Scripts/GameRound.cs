@@ -21,6 +21,18 @@ namespace MagicWorld
         GUIStyle big, mid, small;
         float flash;
 
+        void Awake()
+        {
+            // пересобираем физическую землю по текущему рельефу (иначе остаётся слепок плоской карты)
+            foreach (var tc in FindObjectsByType<TerrainCollider>(FindObjectsSortMode.None))
+            {
+                var d = tc.terrainData;
+                tc.terrainData = null;
+                tc.terrainData = d;
+            }
+            Physics.SyncTransforms();
+        }
+
         void Start()
         {
             total = crystals.Count;
