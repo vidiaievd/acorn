@@ -23,14 +23,22 @@ namespace MagicWorld
 
         void Awake()
         {
-            // пересобираем физическую землю по текущему рельефу (иначе остаётся слепок плоской карты)
-            foreach (var tc in FindObjectsByType<TerrainCollider>(FindObjectsSortMode.None))
+            // физическая земля: проверяем и при необходимости создаём коллайдер Terrain заново
+            var terrain = Terrain.activeTerrain;
+            var origin = hero.transform.position + Vector3.up * 100f;
+            bool ok = Physics.Raycast(origin, Vector3.down, out var hit, 300f);
+            Debug.Log($"[Round] до пересборки: terrain={(terrain != null)}, коллайдер={(terrain != null && terrain.GetComponent<TerrainCollider>() != null)}, луч попал={ok}, y={(ok ? hit.point.y : -999)}, коллайдер='{(ok ? hit.collider.name : "-")}', hero.y={hero.transform.position.y}");
+            if (terrain != null)
             {
-                var d = tc.terrainData;
-                tc.terrainData = null;
-                tc.terrainData = d;
+                var old = terrain.GetComponent<TerrainCollider>();
+                var data = terrain.terrainData;
+                if (old != null) Destroy(old);
+                var fresh = terrain.gameObject.AddComponent<TerrainCollider>();
+                fresh.terrainData = data;
+                Physics.SyncTransforms();
+                ok = Physics.Raycast(origin, Vector3.down, out hit, 300f);
+                Debug.Log($"[Round] после пересборки: луч попал={ok}, y={(ok ? hit.point.y : -999)}, размер данных={data.size}, sample={terrain.SampleHeight(hero.transform.position)}");
             }
-            Physics.SyncTransforms();
         }
 
         void Start()
