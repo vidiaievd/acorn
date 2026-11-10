@@ -55,29 +55,17 @@ namespace MagicWorld
 
         System.Collections.IEnumerator PhysicsProbe()
         {
-            var t = Terrain.activeTerrain; var tc = t.GetComponent<TerrainCollider>();
-            // шар падает над землёй в стороне от героя
-            var pos = hero.transform.position + new Vector3(6, 3, 0);
-            var ball = GameObject.CreatePrimitive(PrimitiveType.Sphere); ball.name = "ProbeBall";
-            ball.transform.position = pos; ball.AddComponent<Rigidbody>();
-            float groundAtBall = t.SampleHeight(pos);
-            var bridge = GameObject.Find("Bridge");
-            GameObject ball2 = null;
-            if (bridge != null)
-            {
-                ball2 = GameObject.CreatePrimitive(PrimitiveType.Sphere); ball2.name = "ProbeBall2";
-                ball2.transform.position = bridge.transform.position + Vector3.up * 3f; ball2.AddComponent<Rigidbody>();
-            }
-            yield return new WaitForSeconds(2f);
-            var sb = new System.Text.StringBuilder("[Probe2] ");
-            sb.AppendLine($"шар: старт y={pos.y:F2}, сейчас y={ball.transform.position.y:F2}, земля y={groundAtBall:F2} -> " + (ball.transform.position.y > groundAtBall - 0.2f ? "ДЕРЖИТ" : "ПРОВАЛИЛСЯ"));
-            if (ball2 != null) sb.AppendLine($"шар над мостом: y={ball2.transform.position.y:F2} (мост y={bridge.transform.position.y:F2}) -> " + (ball2.transform.position.y > bridge.transform.position.y - 0.2f ? "ДЕРЖИТ" : "ПРОВАЛИЛСЯ"));
-            sb.AppendLine($"terrain.enabled={t.enabled} collider.enabled={tc.enabled} data={(tc.terrainData != null)} holesRes={t.terrainData.holesResolution}");
-            sb.AppendLine($"bounds={tc.bounds} material={(tc.sharedMaterial != null ? tc.sharedMaterial.name : "нет")} layer={t.gameObject.layer} gameObjectStatic={t.gameObject.isStatic}");
-            var rb = hero.GetComponent<Rigidbody>();
-            sb.AppendLine($"герой: y={hero.transform.position.y:F2} vel={rb.linearVelocity} isKinematic={rb.isKinematic} gravity={Physics.gravity} defaultContactOffset={Physics.defaultContactOffset}");
+            yield return new WaitForSeconds(3f);
+            var t = Terrain.activeTerrain;
+            var p = hero.transform.position;
+            var sb = new System.Text.StringBuilder("[Probe3] ");
+            sb.AppendLine($"герой y={p.y:F3}, высота земли по Terrain={t.SampleHeight(p) + t.transform.position.y:F3}");
+            var hits = Physics.RaycastAll(p + Vector3.up * 3f, Vector3.down, 20f);
+            System.Array.Sort(hits, (x, y) => y.point.y.CompareTo(x.point.y));
+            foreach (var h in hits) sb.AppendLine($"  луч вниз: {h.collider.name} ({h.collider.GetType().Name}) y={h.point.y:F3}");
+            var capsule = hero.GetComponent<CapsuleCollider>();
+            sb.AppendLine($"капсула: bounds.min.y={capsule.bounds.min.y:F3}, center={capsule.center}, height={capsule.height}, radius={capsule.radius}");
             Debug.Log(sb.ToString());
-            Destroy(ball); if (ball2 != null) Destroy(ball2);
         }
 
         void Awake() { BuildGroundCollider(); }
